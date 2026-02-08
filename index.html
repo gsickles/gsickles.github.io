@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/usr/gsickles</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- ============================================ -->
+    <!-- STYLES                                       -->
+    <!-- ============================================ -->
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f5f5f5;
+        }
+        
+        body.hacker-mode {
+            background-color: #000;
+            color: #0f0;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        
+        body.dark-mode header {
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #444;
+        }
+        
+        body.hacker-mode header {
+            background-color: #000;
+            border-bottom: 1px solid #0f0;
+        }
+        
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: 1px solid #ccc;
+            color: #333;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+        
+        .theme-toggle:hover {
+            background-color: #f0f0f0;
+        }
+        
+        body.dark-mode .theme-toggle {
+            border-color: #666;
+            color: #f5f5f5;
+        }
+        
+        body.dark-mode .theme-toggle:hover {
+            background-color: #2a2a2a;
+        }
+        
+        body.hacker-mode .theme-toggle {
+            border-color: #0f0;
+            color: #0f0;
+        }
+        
+        body.hacker-mode .theme-toggle:hover {
+            background-color: #001100;
+        }
+        
+        nav {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        
+        body.dark-mode nav {
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #444;
+        }
+        
+        body.hacker-mode nav {
+            background-color: #000;
+            border-bottom: 1px solid #0f0;
+        }
+        
+        nav > div {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav a {
+            color: #0066cc;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        
+        nav a:hover {
+            text-decoration: underline;
+        }
+        
+        nav a[data-section]::before {
+            content: '( ) ';
+        }
+        
+        nav a.active::before {
+            content: '(*) ';
+        }
+        
+        article {
+            margin-bottom: 40px;
+        }
+        
+        article h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        #configs h2 {
+            font-family: 'Courier New', monospace;
+        }
+        
+        #projects h2 {
+            text-decoration: underline;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 10px 0;
+            display: none;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        
+        body.dark-mode pre {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+        
+        body.hacker-mode pre {
+            background-color: #001100;
+            border-color: #0f0;
+        }
+        
+        pre.show {
+            display: block;
+        }
+        
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        code[contenteditable="true"] {
+            outline: none;
+        }
+        
+        code[contenteditable="true"]:focus {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 5px 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        
+        body.dark-mode .copy-btn {
+            background: #1a1a1a;
+            border-color: #666;
+            color: #f5f5f5;
+        }
+        
+        .copy-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        body.dark-mode .copy-btn:hover {
+            background: #3a3a3a;
+        }
+        
+        body.hacker-mode .copy-btn {
+            background: #000;
+            border-color: #0f0;
+            color: #0f0;
+        }
+        
+        body.hacker-mode .copy-btn:hover {
+            background: #002200;
+        }
+        
+        .toggle-code {
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        body.dark-mode .toggle-code {
+            color: #6699ff;
+        }
+        
+        body.hacker-mode .toggle-code {
+            color: #00ffff;
+        }
+        
+        .blog-link {
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        
+        .blog-link:hover {
+            text-decoration: underline;
+        }
+        
+        #blog-list ul li {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        body.dark-mode #blog-list ul li {
+            border-bottom-color: #444;
+        }
+        
+        body.hacker-mode #blog-list ul li {
+            border-bottom-color: #0f0;
+        }
+        
+        #blog-list ul li:last-child {
+            border-bottom: none;
+        }
+        
+        #blog-content pre {
+            display: block;
+        }
+        
+        #blog-content code {
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        body.dark-mode #blog-content code {
+            background-color: #2a2a2a;
+        }
+        
+        body.hacker-mode #blog-content code {
+            background-color: #001100;
+        }
+        
+        #blog-content pre code {
+            display: block;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        
+        #blog-content blockquote {
+            border-left: 3px solid #ccc;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+        }
+        
+        body.dark-mode #blog-content blockquote {
+            border-left-color: #666;
+            color: #999;
+        }
+        
+        body.hacker-mode #blog-content blockquote {
+            border-left-color: #0f0;
+            color: #0a0;
+        }
+        
+        #blog-post {
+            margin-top: 0;
+        }
+        
+        #blog-content h2 {
+            margin-top: 0;
+        }
+        
+        .toggle-code:hover {
+            text-decoration: underline;
+        }
+        
+        .date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        body.dark-mode .date {
+            color: #999;
+        }
+        
+        body.hacker-mode .date {
+            color: #0a0;
+        }
+        
+        footer {
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #666;
+            transition: border-color 0.3s, color 0.3s;
+        }
+        
+        body.dark-mode footer {
+            border-top-color: #444;
+            color: #999;
+        }
+        
+        body.hacker-mode footer {
+            border-top-color: #0f0;
+            color: #0a0;
+        }
+        
+        a {
+            color: #0066cc;
+            transition: color 0.3s;
+        }
+        
+        body.dark-mode a {
+            color: #6699ff;
+        }
+        
+        body.hacker-mode a {
+            color: #00ffff;
+        }
+        
+        #snake-game {
+            color: #333;
+        }
+        
+        body.dark-mode #snake-game {
+            color: #f5f5f5;
+        }
+        
+        body.hacker-mode #snake-game {
+            color: #0f0;
+        }
+        
+        #snake-canvas {
+            border: 1px solid #ccc;
+        }
+        
+        body.dark-mode #snake-canvas {
+            border-color: #444;
+        }
+        
+        body.hacker-mode #snake-canvas {
+            border-color: #0f0;
+        }
+    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>></text></svg>">
+</head>
+<body class="dark-mode">
+    <header>
+        <h1>
+            <span onclick="toggleSnake()" style="cursor: pointer;">Garrett Sickles</span>
+            <button class="theme-toggle" onclick="toggleTheme()">[+]</button>
+        </h1>
+    </header>
+    
+    <!-- Snake Game Easter Egg -->
+    <div id="snake-game" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; font-family: 'Courier New', monospace; max-width: 650px; width: calc(100% - 40px); padding: 0 20px;">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <div>Score: <span id="snake-score">0</span></div>
+        </div>
+        <canvas id="snake-canvas" width="650" height="400" style="display: block; width: 100%; height: auto;"></canvas>
+    </div>
+    
+    <nav>
+        <div>
+            <a href="#" onclick="showSection('about'); return false;" class="active" data-section="about">about</a>
+            <!-- <a href="#" onclick="showSection('blog'); return false;" data-section="blog">blog</a> -->
+            <!-- <a href="#" onclick="showSection('projects'); return false;" data-section="projects">projects</a> -->
+            <a href="#" onclick="showSection('tools'); return false;" data-section="tools">tools</a>
+            <a href="#" onclick="showSection('configs'); return false;" data-section="configs">configs</a>
+        </div>
+    </nav>
+    
+    <main id="content">
+        <!-- ============================================ -->
+        <!-- ABOUT SECTION                                -->
+        <!-- ============================================ -->
+        <div id="about" class="section">
+            <article>
+                <h2>About</h2>
+                <p>Video Games, Coffee, & Building Stuff</p>
+            </article>
+        </div>
+        
+        <!-- ============================================ -->
+        <!-- BLOG SECTION                                 -->
+        <!-- ============================================ -->
+        <!-- <div id="blog" class="section" style="display: none;">
+            <div id="blog-list">
+                <h2>Blog Posts</h2>
+                <ul style="list-style: none; padding: 0;">
+                    <li><span class="date">2026-01-15</span> <a href="#" onclick="loadBlogPost('post1'); return false;" class="blog-link">Welcome to My Blog</a></li>
+                    <li><span class="date">2026-01-10</span> <a href="#" onclick="loadBlogPost('post2'); return false;" class="blog-link">Getting Started with Static Sites</a></li>
+                    <li><span class="date">2026-01-05</span> <a href="#" onclick="loadBlogPost('post3'); return false;" class="blog-link">Why I Love Simple Tools</a></li>
+                </ul>
+            </div>
+            
+            <div id="blog-post" style="display: none;">
+                <article id="blog-content"></article>
+            </div>
+        </div> -->
+        
+        <!-- ============================================ -->
+        <!-- PROJECTS SECTION                             -->
+        <!-- ============================================ -->
+        <!-- <div id="projects" class="section" style="display: none;">
+            <article>
+                <h2>Project Name</h2>
+                <p><a href="https://github.com/username/repo" target="_blank">GitHub</a> • <a href="https://demo.example.com" target="_blank">Demo</a></p>
+                <p>Brief description of what the project does and why it's interesting.</p>
+                <p><strong>Tech:</strong> JavaScript, React, Node.js</p>
+            </article>
+            
+            <article>
+                <h2>Another Project</h2>
+                <p><a href="https://github.com/username/repo" target="_blank">GitHub</a></p>
+                <p>Description of this project and its purpose.</p>
+                <p><strong>Tech:</strong> Python, Flask, PostgreSQL</p>
+            </article>
+        </div> -->
+        
+        <!-- ============================================ -->
+        <!-- TOOLS SECTION                                -->
+        <!-- ============================================ -->
+        <div id="tools" class="section" style="display: none;">
+            <article>
+                <h2>Tools</h2>
+                <p><a href="https://gchq.github.io/CyberChef/" target="_blank">CyberChef</a> - The Cyber Swiss Army Knife - a web app for encryption, encoding, compression and data analysis.</p>
+                <p><a href="https://godbolt.org/" target="_blank">Godbolt Compiler Explorer</a> - Compiler Explorer is an interactive online compiler which shows the assembly output of compiled C++, Rust, Go (and many more) code.</p>
+                <p><a href="https://www.overleaf.com/" target="_blank">Overleaf, Online LaTeX Editor</a> - An online LaTeX editor that's easy to use. No installation, real-time collaboration, version control, hundreds of LaTeX templates, and more.</p>
+            </article>
+        </div>
+        
+        <!-- ============================================ -->
+        <!-- CONFIGS SECTION                              -->
+        <!-- ============================================ -->
+        <div id="configs" class="section" style="display: none;">
+            <article>
+                <h2>.gitconfig</h2>
+                <p><a href="#" class="toggle-code" onclick="toggleCode(this); return false;">[show]</a> Git configuration with dag alias</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code contenteditable="true">[user]
+    email = garrett@sickles.dev
+    name = Garrett Sickles
+
+[alias]
+    dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%ar%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+    ca = commit --amend
+    sq = git reset HEAD~1</code></pre>  
+            </article>
+            
+            <article>
+                <h2>.bashrc</h2>
+                <p><a href="#" class="toggle-code" onclick="toggleCode(this); return false;">[show]</a> Bash configuration and aliases </p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code contenteditable="true"># Aliases
+alias ll='ls -la'
+HISTFILE=~/.history
+HISTSIZE=32767
+SAVEHIST=32767
+setopt SHARE_HISTORY
+
+autoload -U colors && colors
+export PS1="%F{magenta}(%D{%Y-%m-%d %H:%M:%S.%.})%f [%3d] %F{yellow}%n%f@%F{cyan}%m %F{yellow}%f$ "</code></pre>
+            </article>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Garrett Sickles - You can find me on <a href="https://github.com/gsickles" target="_blank">GitHub</a>.</p>
+    </footer>
+    
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT                                   -->
+    <!-- ============================================ -->
+    <script>
+        // Snake Game Easter Egg
+        let snakeGame = null;
+        
+        function toggleSnake() {
+            const gameDiv = document.getElementById('snake-game');
+            if (gameDiv.style.display === 'none') {
+                gameDiv.style.display = 'block';
+                updateSnakeColors();
+                startSnake();
+            } else {
+                gameDiv.style.display = 'none';
+                stopSnake();
+            }
+        }
+        
+        function updateSnakeColors() {
+            const canvas = document.getElementById('snake-canvas');
+            const isDark = document.body.classList.contains('dark-mode');
+            
+            if (isDark) {
+                canvas.style.borderColor = '#444';
+            } else {
+                canvas.style.borderColor = '#ccc';
+            }
+        }
+        
+        function startSnake() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            const gridSize = 20;
+            const tileCountX = Math.floor(canvas.width / gridSize);
+            const tileCountY = Math.floor(canvas.height / gridSize);
+            
+            let snake = [{x: 10, y: 10}];
+            let food = {x: 15, y: 10};
+            let dx = 0, dy = 0;
+            let score = 0;
+            let gameRunning = true;
+            
+            function drawGame() {
+                if (!gameRunning) return;
+                
+                const isDark = document.body.classList.contains('dark-mode');
+                const isHacker = document.body.classList.contains('hacker-mode');
+                
+                // Move snake
+                if (dx !== 0 || dy !== 0) {
+                    const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                    
+                    // Check wall collision
+                    if (head.x < 0 || head.x >= tileCountX || head.y < 0 || head.y >= tileCountY) {
+                        gameOver();
+                        return;
+                    }
+                    
+                    // Check self collision
+                    if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                        gameOver();
+                        return;
+                    }
+                    
+                    snake.unshift(head);
+                    
+                    // Check food collision
+                    if (head.x === food.x && head.y === food.y) {
+                        score++;
+                        document.getElementById('snake-score').textContent = score;
+                        spawnFood();
+                    } else {
+                        snake.pop();
+                    }
+                }
+                
+                // Clear canvas with theme-appropriate color
+                if (isHacker) {
+                    ctx.fillStyle = '#000';
+                } else if (isDark) {
+                    ctx.fillStyle = '#1a1a1a';
+                } else {
+                    ctx.fillStyle = '#fff';
+                }
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw snake with theme color
+                if (isHacker) {
+                    ctx.fillStyle = '#0f0';
+                } else if (isDark) {
+                    ctx.fillStyle = '#6699ff';
+                } else {
+                    ctx.fillStyle = '#0066cc';
+                }
+                snake.forEach((segment, index) => {
+                    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+                });
+                
+                // Draw food
+                ctx.fillStyle = '#ff6666';
+                ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+            }
+            
+            function spawnFood() {
+                food = {
+                    x: Math.floor(Math.random() * tileCountX),
+                    y: Math.floor(Math.random() * tileCountY)
+                };
+                // Make sure food doesn't spawn on snake
+                if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+                    spawnFood();
+                }
+            }
+            
+            function gameOver() {
+                gameRunning = false;
+                const isDark = document.body.classList.contains('dark-mode');
+                const isHacker = document.body.classList.contains('hacker-mode');
+                
+                if (isHacker) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                } else if (isDark) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                } else {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                }
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                if (isHacker) {
+                    ctx.fillStyle = '#0f0';
+                } else if (isDark) {
+                    ctx.fillStyle = '#f5f5f5';
+                } else {
+                    ctx.fillStyle = '#333';
+                }
+                ctx.font = '30px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2);
+                ctx.font = '16px Courier New';
+                ctx.fillText('Click name to restart', canvas.width / 2, canvas.height / 2 + 30);
+            }
+            
+            function handleKeyPress(e) {
+                if (e.key === 'Escape') {
+                    toggleSnake();
+                    return;
+                }
+                
+                if (!gameRunning) return;
+                
+                switch(e.key) {
+                    case 'ArrowUp':
+                        if (dy === 0) { dx = 0; dy = -1; }
+                        break;
+                    case 'ArrowDown':
+                        if (dy === 0) { dx = 0; dy = 1; }
+                        break;
+                    case 'ArrowLeft':
+                        if (dx === 0) { dx = -1; dy = 0; }
+                        break;
+                    case 'ArrowRight':
+                        if (dx === 0) { dx = 1; dy = 0; }
+                        break;
+                }
+                e.preventDefault();
+            }
+            
+            document.addEventListener('keydown', handleKeyPress);
+            
+            snakeGame = setInterval(drawGame, 100);
+            
+            // Initial draw
+            drawGame();
+        }
+        
+        function stopSnake() {
+            if (snakeGame) {
+                clearInterval(snakeGame);
+                snakeGame = null;
+            }
+            document.getElementById('snake-score').textContent = '0';
+        }
+        
+        // Blog post data
+        const blogPosts = {
+            post1: {
+                title: 'Welcome to My Blog',
+                date: '2026-01-15',
+                content: `
+This is my corner of the internet where I write about **code**, **tech**, and whatever else I'm working on.
+
+I've been coding for a while now, and I wanted a place to:
+- Share my thoughts
+- Document my learning
+- Maybe help others along the way
+
+Expect posts about web development, tools I find useful, and the occasional deep dive into a problem I've solved.
+                `
+            },
+            post2: {
+                title: 'Getting Started with Static Sites',
+                date: '2026-01-10',
+                content: `
+Static sites are having a moment, and for good reason. They're **fast**, **secure**, and incredibly simple to deploy.
+
+## Why Static?
+
+This site is built with plain HTML, CSS, and vanilla JavaScript. No build tools, no frameworks, just the basics.
+
+Sometimes the simplest solution is the best one. You don't always need a complex stack to build something useful.
+
+\`\`\`javascript
+// Simple is beautiful
+console.log('Hello, world!');
+\`\`\`
+                `
+            },
+            post3: {
+                title: 'Why I Love Simple Tools',
+                date: '2026-01-05',
+                content: `
+In a world of complex frameworks and toolchains, there's something refreshing about simple, focused tools.
+
+### What Makes a Tool Simple?
+
+- Does one thing well
+- Doesn't require hours of configuration
+- Just works
+
+This philosophy extends to code too. Write simple, readable code. Future you will thank present you.
+
+> "Simplicity is the ultimate sophistication." - Leonardo da Vinci
+                `
+            }
+        };
+        
+        function loadBlogPost(postId) {
+            const post = blogPosts[postId];
+            if (!post) return;
+            
+            document.getElementById('blog-list').style.display = 'none';
+            document.getElementById('blog-post').style.display = 'block';
+            
+            const content = document.getElementById('blog-content');
+            content.innerHTML = `
+                <h2>${post.title}</h2>
+                <div class="date">${post.date}</div>
+                ${marked.parse(post.content)}
+            `;
+            
+            // Update URL hash
+            window.location.hash = `blog:${postId}`;
+            
+            window.scrollTo(0, 0);
+        }
+        
+        function showBlogList() {
+            document.getElementById('blog-list').style.display = 'block';
+            document.getElementById('blog-post').style.display = 'none';
+            
+            // Update URL hash to just blog
+            window.location.hash = 'blog';
+            
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            
+            // Check for quintuple click
+            const now = Date.now();
+            if (!window.lastThemeClick) window.lastThemeClick = [];
+            window.lastThemeClick.push(now);
+            
+            // Keep only last 5 clicks within 1 second
+            window.lastThemeClick = window.lastThemeClick.filter(time => now - time < 1000);
+            
+            // Five clicks detected - toggle hacker mode
+            if (window.lastThemeClick.length >= 5) {
+                window.lastThemeClick = [];
+                
+                if (body.classList.contains('hacker-mode')) {
+                    // Exit hacker mode to dark
+                    body.classList.remove('hacker-mode');
+                    body.classList.add('dark-mode');
+                    button.textContent = '[+]';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    // Enter hacker mode
+                    body.classList.remove('dark-mode');
+                    body.classList.add('hacker-mode');
+                    button.textContent = '[H]';
+                    localStorage.setItem('theme', 'hacker');
+                }
+                return;
+            }
+            
+            // Normal single click - toggle between light and dark only
+            if (body.classList.contains('hacker-mode')) {
+                // If in hacker mode, go to dark
+                body.classList.remove('hacker-mode');
+                body.classList.add('dark-mode');
+                button.textContent = '[+]';
+                localStorage.setItem('theme', 'dark');
+            } else if (body.classList.contains('dark-mode')) {
+                // Dark to light
+                body.classList.remove('dark-mode');
+                button.textContent = '[-]';
+                localStorage.setItem('theme', 'light');
+            } else {
+                // Light to dark
+                body.classList.add('dark-mode');
+                button.textContent = '[+]';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Load saved theme on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const button = document.querySelector('.theme-toggle');
+            
+            // If light mode is saved, switch to light
+            if (savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.remove('hacker-mode');
+                button.textContent = '[-]';
+            } else if (savedTheme === 'hacker') {
+                // Hacker mode
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('hacker-mode');
+                button.textContent = '[H]';
+            } else {
+                // Default to dark mode (already set in body tag)
+                document.body.classList.add('dark-mode');
+                button.textContent = '[+]';
+                if (!savedTheme) {
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+            
+            // Load section from URL hash
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                showSection(hash);
+            } else if (hash.startsWith('blog:')) {
+                // Handle blog post URLs like #blog:post1
+                const postId = hash.split(':')[1];
+                showSection('blog');
+                if (blogPosts[postId]) {
+                    loadBlogPost(postId);
+                }
+            }
+        });
+        
+        function copyCode(button) {
+            const code = button.nextElementSibling;
+            navigator.clipboard.writeText(code.textContent).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+        
+        function toggleCode(link) {
+            const pre = link.parentElement.nextElementSibling;
+            if (pre.classList.contains('show')) {
+                pre.classList.remove('show');
+                link.textContent = '[show]';
+            } else {
+                pre.classList.add('show');
+                link.textContent = '[hide]';
+            }
+        }
+        
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // If clicking blog nav while viewing a post, show the list
+            if (sectionId === 'blog') {
+                const blogPost = document.getElementById('blog-post');
+                const blogList = document.getElementById('blog-list');
+                if (blogPost && blogPost.style.display === 'block') {
+                    showBlogList();
+                    return;
+                }
+            }
+            
+            // Update active link
+            const links = document.querySelectorAll('nav a[data-section]');
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Update URL hash
+            window.location.hash = sectionId;
+        }
+    </script>
+</body>
+</html>
