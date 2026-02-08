@@ -1,0 +1,15 @@
+[package]
+name = "html-gen"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+minify-js = "0.5"
+
+[[bin]]
+name = "generate"
+path = "index.rs"
+
+[[example]]
+name = "showcase"
+path = "examples/showcase.rs"

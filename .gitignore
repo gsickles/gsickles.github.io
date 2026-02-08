@@ -9,8 +9,9 @@ Thumbs.db
 Desktop.ini
 
 # Editor and IDE files
-.vscode/
-.idea/
+.vscode
+.idea
+.kiro
 *.swp
 *.swo
 *~
@@ -32,6 +33,8 @@ yarn.lock
 .cache/
 dist/
 build/
+/target
+Cargo.lock
 
 # Environment variables
 .env

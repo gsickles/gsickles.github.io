@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Conway's Game of Life</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+			background: #1a1a1a;
+			font-family: 'Courier New', monospace;
+			color: #f5f5f5;
+		}
+		#gameContainer {
+			text-align: center;
+		}
+		canvas {
+			border: 2px solid #444;
+			display: block;
+			margin: 20px auto;
+			background: #000;
+			cursor: crosshair;
+		}
+		#controls {
+			margin-bottom: 15px;
+			display: flex;
+			gap: 10px;
+			justify-content: center;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+		#sizeControl {
+			display: flex;
+			gap: 5px;
+			align-items: center;
+		}
+		#sizeControl label {
+			font-size: 14px;
+		}
+		#sizeControl input {
+			width: 60px;
+			background: #222;
+			border: 1px solid #666;
+			color: #f5f5f5;
+			padding: 6px;
+			font-family: 'Courier New', monospace;
+		}
+		button {
+			background: #333;
+			border: 1px solid #666;
+			color: #f5f5f5;
+			padding: 8px 16px;
+			cursor: pointer;
+			font-family: 'Courier New', monospace;
+			font-size: 14px;
+		}
+		button:hover {
+			background: #444;
+		}
+		button:active {
+			background: #222;
+		}
+		#info {
+			font-size: 16px;
+			margin-bottom: 10px;
+		}
+		#instructions {
+			font-size: 14px;
+			margin-top: 15px;
+			max-width: 1024px;
+			line-height: 1.6;
+		}
+		.pattern-btn {
+			background: #2a4a2a;
+		}
+		.pattern-btn:hover {
+			background: #3a5a3a;
+		}
+	</style>
+</head>
+<body>
+	<div id="gameContainer">
+		<div id="info">Generation: 0 | Population: 0</div>
+		<div id="controls">
+			<button id="playPause">Play</button>
+			<button id="step">Step</button>
+			<button id="clear">Clear</button>
+			<button id="random">Random</button>
+			<button class="pattern-btn" id="glider">Glider</button>
+			<button class="pattern-btn" id="pulsar">Pulsar</button>
+			<button class="pattern-btn" id="gosper">Gosper Gun</button>
+			<div id="sizeControl">
+				<label for="cellSize">Cell Size:</label>
+				<input type="number" id="cellSize" min="2" max="20" value="8">
+				<button id="resize">Resize</button>
+			</div>
+		</div>
+		<canvas id="game" width="1024" height="1024"></canvas>
+		<div id="instructions">
+			Click cells to toggle them on/off. Use patterns for interesting starting configurations.
+			<br>Rules: A live cell with 2-3 neighbors survives. A dead cell with 3 neighbors becomes alive.
+		</div>
+	</div>
+	<script>
+		const canvas = document.getElementById('game');
+		const ctx = canvas.getContext('2d');
+		const infoEl = document.getElementById('info');
+
+		let cellSize = 8;
+		let cols = canvas.width / cellSize;
+		let rows = canvas.height / cellSize;
+
+		let grid = createGrid();
+		let running = false;
+		let generation = 0;
+		let animationId = null;
+
+		function createGrid() {
+			return Array(rows).fill().map(() => Array(cols).fill(0));
+		}
+
+		function resizeGrid() {
+			const newCellSize = parseInt(document.getElementById('cellSize').value);
+			if (newCellSize < 2 || newCellSize > 20) {
+				alert('Cell size must be between 2 and 20');
+				return;
+			}
+			cellSize = newCellSize;
+			cols = Math.floor(canvas.width / cellSize);
+			rows = Math.floor(canvas.height / cellSize);
+			grid = createGrid();
+			generation = 0;
+			running = false;
+			document.getElementById('playPause').textContent = 'Play';
+			draw();
+		}
+
+		function countNeighbors(grid, x, y) {
+			let count = 0;
+			for (let i = -1; i <= 1; i++) {
+				for (let j = -1; j <= 1; j++) {
+					if (i === 0 && j === 0) continue;
+					const row = (y + i + rows) % rows;
+					const col = (x + j + cols) % cols;
+					count += grid[row][col];
+				}
+			}
+			return count;
+		}
+
+		function nextGeneration() {
+			const newGrid = createGrid();
+			for (let y = 0; y < rows; y++) {
+				for (let x = 0; x < cols; x++) {
+					const neighbors = countNeighbors(grid, x, y);
+					if (grid[y][x] === 1) {
+						newGrid[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+					} else {
+						newGrid[y][x] = neighbors === 3 ? 1 : 0;
+					}
+				}
+			}
+			grid = newGrid;
+			generation++;
+		}
+
+		function draw() {
+			ctx.fillStyle = '#000';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			let population = 0;
+			for (let y = 0; y < rows; y++) {
+				for (let x = 0; x < cols; x++) {
+					if (grid[y][x] === 1) {
+						ctx.fillStyle = '#0f0';
+						ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+						population++;
+					}
+				}
+			}
+
+			infoEl.textContent = `Generation: ${generation} | Population: ${population}`;
+		}
+
+		function gameLoop() {
+			if (running) {
+				nextGeneration();
+				draw();
+				animationId = setTimeout(gameLoop, 100);
+			}
+		}
+
+		canvas.addEventListener('click', (e) => {
+			const rect = canvas.getBoundingClientRect();
+			const x = Math.floor((e.clientX - rect.left) / cellSize);
+			const y = Math.floor((e.clientY - rect.top) / cellSize);
+			if (x >= 0 && x < cols && y >= 0 && y < rows) {
+				grid[y][x] = grid[y][x] ? 0 : 1;
+				draw();
+			}
+		});
+
+		document.getElementById('playPause').addEventListener('click', () => {
+			running = !running;
+			document.getElementById('playPause').textContent = running ? 'Pause' : 'Play';
+			if (running) gameLoop();
+		});
+
+		document.getElementById('step').addEventListener('click', () => {
+			if (!running) {
+				nextGeneration();
+				draw();
+			}
+		});
+
+		document.getElementById('clear').addEventListener('click', () => {
+			grid = createGrid();
+			generation = 0;
+			running = false;
+			document.getElementById('playPause').textContent = 'Play';
+			draw();
+		});
+
+		document.getElementById('random').addEventListener('click', () => {
+			grid = createGrid();
+			for (let y = 0; y < rows; y++) {
+				for (let x = 0; x < cols; x++) {
+					grid[y][x] = Math.random() > 0.7 ? 1 : 0;
+				}
+			}
+			generation = 0;
+			draw();
+		});
+
+		document.getElementById('glider').addEventListener('click', () => {
+			grid = createGrid();
+			const startX = Math.floor(cols / 2);
+			const startY = Math.floor(rows / 2);
+			grid[startY][startX + 1] = 1;
+			grid[startY + 1][startX + 2] = 1;
+			grid[startY + 2][startX] = 1;
+			grid[startY + 2][startX + 1] = 1;
+			grid[startY + 2][startX + 2] = 1;
+			generation = 0;
+			draw();
+		});
+
+		document.getElementById('pulsar').addEventListener('click', () => {
+			grid = createGrid();
+			const cx = Math.floor(cols / 2);
+			const cy = Math.floor(rows / 2);
+			const pattern = [
+				[2,0],[3,0],[4,0],[8,0],[9,0],[10,0],
+				[0,2],[5,2],[7,2],[12,2],
+				[0,3],[5,3],[7,3],[12,3],
+				[0,4],[5,4],[7,4],[12,4],
+				[2,5],[3,5],[4,5],[8,5],[9,5],[10,5],
+				[2,7],[3,7],[4,7],[8,7],[9,7],[10,7],
+				[0,8],[5,8],[7,8],[12,8],
+				[0,9],[5,9],[7,9],[12,9],
+				[0,10],[5,10],[7,10],[12,10],
+				[2,12],[3,12],[4,12],[8,12],[9,12],[10,12]
+			];
+			pattern.forEach(([x, y]) => {
+				grid[cy + y - 6][cx + x - 6] = 1;
+			});
+			generation = 0;
+			draw();
+		});
+
+		document.getElementById('gosper').addEventListener('click', () => {
+			grid = createGrid();
+			const startX = 5;
+			const startY = 5;
+			const pattern = [
+				[24,0],[22,1],[24,1],[12,2],[13,2],[20,2],[21,2],[34,2],[35,2],
+				[11,3],[15,3],[20,3],[21,3],[34,3],[35,3],[0,4],[1,4],[10,4],
+				[16,4],[20,4],[21,4],[0,5],[1,5],[10,5],[14,5],[16,5],[17,5],
+				[22,5],[24,5],[10,6],[16,6],[24,6],[11,7],[15,7],[12,8],[13,8]
+			];
+			pattern.forEach(([x, y]) => {
+				if (startY + y < rows && startX + x < cols) {
+					grid[startY + y][startX + x] = 1;
+				}
+			});
+			generation = 0;
+			draw();
+		});
+
+		document.getElementById('resize').addEventListener('click', resizeGrid);
+
+		draw();
+	</script>
+</body>
+</html>

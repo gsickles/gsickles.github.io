@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Pong</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+			background: #000;
+			font-family: 'Courier New', monospace;
+			color: #0f0;
+		}
+		#gameContainer {
+			text-align: center;
+		}
+		canvas {
+			border: 2px solid #0f0;
+			display: block;
+			margin: 20px auto;
+		}
+		#score {
+			font-size: 24px;
+			margin-bottom: 10px;
+		}
+		#instructions {
+			font-size: 14px;
+			margin-top: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div id="gameContainer">
+		<div id="score">Player: 0 | CPU: 0</div>
+		<canvas id="pong" width="800" height="400"></canvas>
+		<div id="instructions">W/S or Arrow Keys to move | Space to start</div>
+	</div>
+	<script>
+		const canvas = document.getElementById('pong');
+		const ctx = canvas.getContext('2d');
+		const scoreEl = document.getElementById('score');
+
+		const ball = { x: 400, y: 200, radius: 8, dx: 0, dy: 0, speed: 4 };
+		const paddle = { width: 10, height: 80, speed: 6 };
+		const player = { x: 20, y: 160, score: 0 };
+		const cpu = { x: 770, y: 160, score: 0 };
+		let gameStarted = false;
+
+		const keys = {};
+		document.addEventListener('keydown', e => keys[e.key] = true);
+		document.addEventListener('keyup', e => keys[e.key] = false);
+
+		function resetBall() {
+			ball.x = 400;
+			ball.y = 200;
+			ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+			ball.dy = (Math.random() - 0.5) * ball.speed;
+		}
+
+		function draw() {
+			ctx.fillStyle = '#000';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			ctx.fillStyle = '#0f0';
+			ctx.fillRect(player.x, player.y, paddle.width, paddle.height);
+			ctx.fillRect(cpu.x, cpu.y, paddle.width, paddle.height);
+
+			ctx.beginPath();
+			ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+			ctx.fill();
+
+			ctx.setLineDash([5, 5]);
+			ctx.beginPath();
+			ctx.moveTo(400, 0);
+			ctx.lineTo(400, 400);
+			ctx.strokeStyle = '#0f0';
+			ctx.stroke();
+			ctx.setLineDash([]);
+		}
+
+		function update() {
+			if (!gameStarted) {
+				if (keys[' ']) {
+					gameStarted = true;
+					resetBall();
+				}
+				return;
+			}
+
+			if ((keys['w'] || keys['ArrowUp']) && player.y > 0) player.y -= paddle.speed;
+			if ((keys['s'] || keys['ArrowDown']) && player.y < 320) player.y += paddle.speed;
+
+			cpu.y += (ball.y - (cpu.y + paddle.height / 2)) * 0.1;
+			cpu.y = Math.max(0, Math.min(320, cpu.y));
+
+			ball.x += ball.dx;
+			ball.y += ball.dy;
+
+			if (ball.y - ball.radius < 0 || ball.y + ball.radius > 400) ball.dy *= -1;
+
+			if (ball.x - ball.radius < player.x + paddle.width &&
+				ball.y > player.y && ball.y < player.y + paddle.height) {
+				ball.dx = Math.abs(ball.dx);
+				ball.dy += (ball.y - (player.y + paddle.height / 2)) * 0.1;
+			}
+
+			if (ball.x + ball.radius > cpu.x &&
+				ball.y > cpu.y && ball.y < cpu.y + paddle.height) {
+				ball.dx = -Math.abs(ball.dx);
+				ball.dy += (ball.y - (cpu.y + paddle.height / 2)) * 0.1;
+			}
+
+			if (ball.x < 0) {
+				cpu.score++;
+				gameStarted = false;
+			}
+			if (ball.x > 800) {
+				player.score++;
+				gameStarted = false;
+			}
+
+			scoreEl.textContent = `Player: ${player.score} | CPU: ${cpu.score}`;
+		}
+
+		function gameLoop() {
+			update();
+			draw();
+			requestAnimationFrame(gameLoop);
+		}
+
+		gameLoop();
+	</script>
+</body>
+</html>

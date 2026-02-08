@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		</meta>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		</meta>
+		<title>HTML Macro Showcase</title>
+		<style>
+body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+pre { background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+.highlight { background-color: yellow; }
+form { margin: 20px 0; }
+label { display: block; margin-top: 10px; }
+input, textarea, select { width: 100%; padding: 8px; margin-top: 5px; }
+button { margin-top: 10px; padding: 10px 20px; cursor: pointer; }
+hr { margin: 30px 0; border: none; border-top: 2px solid #ddd; }
+blockquote { border-left: 4px solid #ddd; padding-left: 20px; margin: 20px 0; color: #666; }
+figure { margin: 20px 0; text-align: center; }
+figcaption { font-style: italic; color: #666; margin-top: 10px; }
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>HTML Macro Showcase</h1>
+			<p>A comprehensive example of all available HTML macros</p>
+		</header>
+		<nav>
+			<a href="#headings">Headings</a> | <a href="#text">Text</a> | <a href="#lists">Lists</a> | <a href="#tables">Tables</a> | <a href="#forms">Forms</a> | <a href="#media">Media</a>
+		</nav>
+		<hr>
+		<main>
+			<section id="headings">
+				<h2>Headings</h2>
+				<h1>This is H1</h1>
+				<h2>This is H2</h2>
+				<h3>This is H3</h3>
+				<h4>This is H4</h4>
+				<h5>This is H5</h5>
+				<h6>This is H6</h6>
+			</section>
+			<hr>
+			<section id="text">
+				<h2>Text Formatting</h2>
+				<p>This paragraph demonstrates various text formatting options. You can use <strong>strong (bold)</strong> text, <em>emphasized (italic)</em> text, and <code>inline code</code> formatting.</p>
+				<p>You can also use <span class="highlight">spans with classes</span> for custom styling.</p>
+				<p>Line breaks work like this:<br>This is on a new line<br>And this is on another line</p>
+				<blockquote>
+					<p>This is a blockquote. It's useful for highlighting quoted text or important information.</p>
+				</blockquote>
+				<h3>Code Blocks</h3>
+				<pre><code>fn main() {
+    let page = html! {
+        html[lang="en"] {
+            body { p { "Hello, world!" } }
+        }
+    };
+}</code></pre>
+			</section>
+			<hr>
+			<section id="lists">
+				<h2>Lists</h2>
+				<h3>Unordered List</h3>
+				<ul>
+					<li>First item</li>
+					<li>Second item</li>
+					<li>Third item with <strong>bold text</strong></li>
+				</ul>
+				<h3>Ordered List</h3>
+				<ol>
+					<li>Step one</li>
+					<li>Step two</li>
+					<li>Step three</li>
+				</ol>
+				<h3>Nested Lists</h3>
+				<ul>
+					<li>Parent item 1
+						<ul>
+							<li>Child item 1.1</li>
+							<li>Child item 1.2</li>
+						</ul>
+					</li>
+					<li>Parent item 2</li>
+				</ul>
+			</section>
+			<hr>
+			<section id="tables">
+				<h2>Tables</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Language</th>
+							<th>Year</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Rust</td>
+							<td>Systems Programming</td>
+							<td>2010</td>
+						</tr>
+						<tr>
+							<td>JavaScript</td>
+							<td>Web Development</td>
+							<td>1995</td>
+						</tr>
+						<tr>
+							<td>Python</td>
+							<td>General Purpose</td>
+							<td>1991</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			<hr>
+			<section id="forms">
+				<h2>Forms</h2>
+				<form action="/submit" method="post">
+					<label for="name">Name:</label>
+					<input type="text" id="name" name="name" placeholder="Enter your name">
+					<label for="email">Email:</label>
+					<input type="email" id="email" name="email" placeholder="your@email.com">
+					<label for="country">Country:</label>
+					<select id="country" name="country">
+						<option value="">Select a country</option>
+						<option value="us">United States</option>
+						<option value="uk">United Kingdom</option>
+						<option value="ca">Canada</option>
+						<option value="au">Australia</option>
+					</select>
+					<label for="message">Message:</label>
+					<textarea id="message" name="message" rows="4" placeholder="Enter your message">
+					</textarea>
+					<button type="submit">Submit Form</button>
+				</form>
+			</section>
+			<hr>
+			<section id="media">
+				<h2>Media Elements</h2>
+				<h3>Images</h3>
+				<figure>
+					<img src="https://via.placeholder.com/400x200" alt="Placeholder image">
+					<figcaption>Figure 1: A placeholder image</figcaption>
+				</figure>
+				<h3>Canvas</h3>
+				<p>Canvas element for drawing graphics:</p>
+				<canvas id="myCanvas" width="400" height="200" style="border: 1px solid #ddd;"></canvas>
+			</section>
+			<hr>
+			<section id="other">
+				<h2>Other Elements</h2>
+				<article>
+					<h3>Article Element</h3>
+					<p>This is an article element, typically used for self-contained content.</p>
+				</article>
+				<aside>
+					<h4>Aside Element</h4>
+					<p>This is an aside, typically used for sidebars or tangentially related content.</p>
+				</aside>
+			</section>
+		</main>
+		<hr>
+		<footer>
+			<p>This showcase demonstrates all available HTML macros in the templating system.</p>
+			<p>Generated with Rust • <a href="https://github.com">View on GitHub</a></p>
+		</footer>
+	</body>
+</html>
